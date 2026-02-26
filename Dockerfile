@@ -11,9 +11,15 @@
 # ---------------------------------------------------------------------------
 FROM debian:bookworm-slim
 
-# Install ca-certificates so HTTPS calls to the Condeco API work
+# Install:
+# ca-certificates – required for HTTPS calls to the Condeco API
+# libicu72        – required by .NET for globalization (dates, timezones, etc.)
+#                   Bookworm ships ICU 72; update the version suffix if you
+#                   ever rebase onto a newer Debian release.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates \
+    && apt-get install -y --no-install-recommends \
+         ca-certificates \
+         libicu72 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -67,27 +67,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ steps.tag.outputs.value }}"
-
-          # List assets for this release and pick the Linux one
-          ASSET_URL=$(gh release view "$TAG" \
-            --repo "${{ github.repository }}" \
-            --json assets \
-            --jq '.assets[] | select(.name | test("condeco-cli-linux-x64"; "i")) | .url')
-
-          if [ -z "$ASSET_URL" ]; then
-            echo "ERROR: No Linux asset found for release $TAG" >&2
-            exit 1
-          fi
+          ASSET_NAME="condeco-cli-linux-x64"
 
           echo "Downloading: $ASSET_URL"
           gh release download "$TAG" \
             --repo "${{ github.repository }}" \
-            --pattern "*linux*" \
+            --pattern "$ASSET_NAME" \
             --dir ./docker-context/
 
           # Rename whatever we downloaded to the fixed name the Dockerfile expects
-          DOWNLOADED=$(ls ./docker-context/)
-          mv "./docker-context/$DOWNLOADED" ./docker-context/condeco-cli
+          mv "./docker-context/$ASSET_NAME" ./docker-context/condeco-cli
           chmod +x ./docker-context/condeco-cli
 
       # -----------------------------------------------------------------------
